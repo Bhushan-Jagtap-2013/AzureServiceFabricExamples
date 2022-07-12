@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -13,6 +13,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.ServiceFabric.Services" Version="6.0.1017" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ecommerce.ProductCatalog.Model\Ecommerce.ProductCatalog.Model.csproj" />
   </ItemGroup>
 
 </Project>
