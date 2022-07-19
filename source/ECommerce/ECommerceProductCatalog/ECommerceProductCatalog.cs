@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Ecommerce.ProductCatalog.Model;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 
 namespace ECommerceProductCatalog
@@ -14,13 +15,23 @@ namespace ECommerceProductCatalog
     /// <summary>
     /// An instance of this class is created for each service replica by the Service Fabric runtime.
     /// </summary>
-    internal sealed class ECommerceProductCatalog : StatefulService
+    internal sealed class ECommerceProductCatalog : StatefulService, IProductCatalogService
     {
-        private ServiceFabricProductRepository _serviceFabricProductRepository;
+        private IProductRepository _serviceFabricProductRepository;
 
         public ECommerceProductCatalog(StatefulServiceContext context)
             : base(context)
         { }
+
+        public async Task AddProductAsync(Product product)
+        {
+            await _serviceFabricProductRepository.AddProduct(product);
+        }
+
+        public async Task<Product[]> GetAllProductsAsync()
+        {
+            return (await _serviceFabricProductRepository.GetAllProducts()).ToArray();
+        }
 
         /// <summary>
         /// Optional override to create listeners (e.g., HTTP, Service Remoting, WCF, etc.) for this service replica to handle client or user requests.
@@ -31,7 +42,11 @@ namespace ECommerceProductCatalog
         /// <returns>A collection of listeners.</returns>
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
-            return new ServiceReplicaListener[0];
+            return new[]
+            {
+                new ServiceReplicaListener(context => 
+                    new FabricTransportServiceRemotingListener(context, this))
+            };
         }
 
         /// <summary>
@@ -52,7 +67,17 @@ namespace ECommerceProductCatalog
                 Availability = 2,
             };
 
+            var product2 = new Product
+            {
+                Id = Guid.NewGuid(),
+                Name = "Car",
+                Description = "Go from point one to point two",
+                Price = 10000,
+                Availability = 1,
+            };
+
             await _serviceFabricProductRepository.AddProduct(product1);
+            await _serviceFabricProductRepository.AddProduct(product2);
 
             IEnumerable<Product> all = await _serviceFabricProductRepository.GetAllProducts();
         }

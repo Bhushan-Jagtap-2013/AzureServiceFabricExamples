@@ -6,5 +6,8 @@ namespace ECommerce.WebApi.Model
     {
         [JsonProperty("id")]
         public Guid Id { get; set; }
+
+        [JsonProperty("Description")]
+        public string Description { get; set; }    
     }
 }
