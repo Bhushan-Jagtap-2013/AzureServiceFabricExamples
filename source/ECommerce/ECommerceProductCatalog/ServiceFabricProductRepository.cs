@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ECommerceProductCatalog
 {
-    internal class ServiceFabricProductRepository
+    internal class ServiceFabricProductRepository : IProductRepository
     {
         private readonly IReliableStateManager reliableStateManager;
 
